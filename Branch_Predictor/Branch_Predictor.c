@@ -101,7 +101,6 @@ Branch_Predictor *initBranchPredictor()
 	#ifdef GSHARE
     assert(checkPowerofTwo(gsharePredictorSize));
 	
-	branch_predictor->gshare_predictor_size = gsharePredictorSize;
     branch_predictor->gshare_counters = 
         (Sat_Counter *)malloc(gsharePredictorSize * sizeof(Sat_Counter));
 	

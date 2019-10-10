@@ -53,7 +53,6 @@ typedef struct Branch_Predictor
     #endif
 
 	#ifdef GSHARE
-    unsigned gshare_predictor_size;
     unsigned global_history_mask;
     Sat_Counter *gshare_counters;
     uint64_t global_history;
