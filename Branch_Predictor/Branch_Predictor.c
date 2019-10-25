@@ -12,7 +12,7 @@ const unsigned choicePredictorSize = 16384; // Keep this the same as globalPredi
 const unsigned choiceCounterBits = 2;
 const unsigned gshareCounterBits = 2; //Do not change this
 const unsigned gsharePredictorSize = 65536;
-const float theta = 133.66;
+const float theta = 1.93*n + 14;
 
 Branch_Predictor *initBranchPredictor()
 {
@@ -117,6 +117,7 @@ Branch_Predictor *initBranchPredictor()
     #endif
 
 	#ifdef perceptron
+	assert(checkPowerofTwo(p_size));
 	branch_predictor->p_mask = p_size - 1;
 	int i = 0;
 
@@ -318,19 +319,6 @@ bool predict(Branch_Predictor *branch_predictor, Instruction *instr)
 		}
 	}
 
-	/*for (i = 0; i < n; i++) {
-		printf("%i, ", branch_predictor->global_history[i]);
-	}
-	printf("end first\n ");*/
-
-	/*for (i = 0; i < n; i++) {
-		printf("%i, ", temp[i]);
-	}
-	printf("end second\n ");*/
-
-
-	//for (i = n-1; i > 0; i--) {
-	
 	for (i = n-1; i >= 0; i--) {
 		branch_predictor->global_history[i+1] = branch_predictor->global_history[i];
 	}
@@ -341,11 +329,6 @@ bool predict(Branch_Predictor *branch_predictor, Instruction *instr)
 	else {
 		branch_predictor->global_history[0] = -1;
 	}
-
-	/*for (i = 0; i < n; i++) {
-		printf("%i, ", branch_predictor->global_history[i]);
-	}
-	printf("end second\n\n ");*/
 
 	return prediction_correct;
 	
