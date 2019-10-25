@@ -274,15 +274,15 @@ bool predict(Branch_Predictor *branch_predictor, Instruction *instr)
 	#endif
 
 	#ifdef perceptron
-	int i = 1;
+	int i;
 	bool res;
 	bool prediction_correct;
 	int sign;
 	unsigned hash;
 	hash = getIndex(branch_address, branch_predictor->p_mask);
-	//hash = branch_address % branch_predictor->p_mask;
+
 	float y = branch_predictor->P[hash][0];
-	for (i; i < n; i++) {
+	for (i = 1; i < n; i++) {
 		y += branch_predictor->P[hash][i]*branch_predictor->global_history[i];
 	}
 	
@@ -308,10 +308,22 @@ bool predict(Branch_Predictor *branch_predictor, Instruction *instr)
 			branch_predictor->P[hash][i] = branch_predictor->P[hash][i] + sign*branch_predictor->global_history[i];
 		}
 	}
-	
+
+	/*for (i = 0; i < n; i++) {
+		printf("%i, ", branch_predictor->global_history[i]);
+	}
+	printf("end first\n ");*/
+
+	/*for (i = 0; i < n; i++) {
+		printf("%i, ", temp[i]);
+	}
+	printf("end second\n ");*/
+
+
 	//for (i = n-1; i > 0; i--) {
-	for (i = 1; i < n; i++) {
-		branch_predictor->global_history[i] = branch_predictor->global_history[i-1];
+	
+	for (i = n-1; i >= 0; i--) {
+		branch_predictor->global_history[i+1] = branch_predictor->global_history[i];
 	}
 
 	if (instr->taken) {
@@ -320,6 +332,12 @@ bool predict(Branch_Predictor *branch_predictor, Instruction *instr)
 	else {
 		branch_predictor->global_history[0] = -1;
 	}
+
+	/*for (i = 0; i < n; i++) {
+		printf("%i, ", branch_predictor->global_history[i]);
+	}
+	printf("end second\n\n ");*/
+
 	return prediction_correct;
 	
 	#endif
