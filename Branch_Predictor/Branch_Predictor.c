@@ -3,15 +3,16 @@
 const unsigned instShiftAmt = 2; // Number of bits to shift a PC by
 
 // You can play around with these settings.
-const unsigned localPredictorSize = 2048;
+const unsigned localPredictorSize = 65536;
 const unsigned localCounterBits = 2;
-const unsigned localHistoryTableSize = 2048; 
-const unsigned globalPredictorSize = 65536;
+const unsigned localHistoryTableSize = 8192; 
+const unsigned globalPredictorSize = 16384;
 const unsigned globalCounterBits = 2;
-const unsigned choicePredictorSize = 65536; // Keep this the same as globalPredictorSize.
+const unsigned choicePredictorSize = 16384; // Keep this the same as globalPredictorSize.
 const unsigned choiceCounterBits = 2;
 const unsigned gshareCounterBits = 2; //Do not change this
 const unsigned gsharePredictorSize = 65536;
+const float theta = 133.66;
 
 Branch_Predictor *initBranchPredictor()
 {
@@ -114,6 +115,14 @@ Branch_Predictor *initBranchPredictor()
     
 	branch_predictor->global_history = 0;
     #endif
+
+	#ifdef perceptron
+	branch_predictor->p_mask = p_size - 1;
+	int i = 0;
+	/*for (i; i < n; i++) {
+		branch_predictor->global_history[i] = 1;
+	}*/
+	#endif
 
     return branch_predictor;
 }
@@ -261,8 +270,58 @@ bool predict(Branch_Predictor *branch_predictor, Instruction *instr)
     }
 	// update global history register
 	branch_predictor->global_history = branch_predictor->global_history << 1 | instr->taken;
-    return prediction_correct;
+	return prediction_correct;
+	#endif
 
+	#ifdef perceptron
+	int i = 1;
+	bool res;
+	bool prediction_correct;
+	int sign;
+	unsigned hash;
+	hash = getIndex(branch_address, branch_predictor->p_mask);
+	//hash = branch_address % branch_predictor->p_mask;
+	float y = branch_predictor->P[hash][0];
+	for (i; i < n; i++) {
+		y += branch_predictor->P[hash][i]*branch_predictor->global_history[i];
+	}
+	
+	if (y < 0) {
+		res = false;
+		sign = -1;
+	}
+	else {
+		res = true;
+		sign = 1;
+	}
+	
+	prediction_correct = res == instr->taken;
+
+	if (!prediction_correct || (fabs(y) <= theta)) {
+		if (prediction_correct) {
+			branch_predictor->P[hash][0] = branch_predictor->P[hash][i] + 1;
+		}
+		else {
+			branch_predictor->P[hash][0] = branch_predictor->P[hash][i] - 1;
+		}
+		for (i = 1; i < n; i++) {
+			branch_predictor->P[hash][i] = branch_predictor->P[hash][i] + sign*branch_predictor->global_history[i];
+		}
+	}
+	
+	//for (i = n-1; i > 0; i--) {
+	for (i = 1; i < n; i++) {
+		branch_predictor->global_history[i] = branch_predictor->global_history[i-1];
+	}
+
+	if (instr->taken) {
+		branch_predictor->global_history[0] = 1;
+	}
+	else {
+		branch_predictor->global_history[0] = -1;
+	}
+	return prediction_correct;
+	
 	#endif
 }
 

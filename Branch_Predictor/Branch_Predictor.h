@@ -9,10 +9,14 @@
 
 #include "Instruction.h"
 
+#define p_size 32768
+#define n 62
+
 // Predictor type
 // #define TWO_BIT_LOCAL
 // #define TOURNAMENT
-#define GSHARE
+// #define GSHARE
+#define perceptron
 
 // saturating counter
 typedef struct Sat_Counter
@@ -57,6 +61,12 @@ typedef struct Branch_Predictor
     Sat_Counter *gshare_counters;
     uint64_t global_history;
     #endif
+
+	#ifdef perceptron
+	int64_t global_history[62];
+	int64_t P[p_size][62];
+	unsigned p_mask;
+	#endif
 
 }Branch_Predictor;
 
