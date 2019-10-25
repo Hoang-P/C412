@@ -117,17 +117,19 @@ Branch_Predictor *initBranchPredictor()
     #endif
 
 	#ifdef perceptron
+	
 	assert(checkPowerofTwo(p_size));
 	branch_predictor->p_mask = p_size - 1;
-	int i = 0;
 
-	for (i; i < n; i++) {
+	int i;
+	int j;
+
+	for (i = 0;i < n;i++) {
 		branch_predictor->global_history[i] = 0;
 	}
-	
-	int j;
-	for (i = 0; i < p_size; i++) {
-		for (j = 0; j < n; j++) {
+
+	for (i = 0;i < p_size; i++) {
+		for (j = 0;j < n;j++) {
 			branch_predictor->P[i][j] = 0;
 		}
 	}
@@ -313,7 +315,7 @@ bool predict(Branch_Predictor *branch_predictor, Instruction *instr)
 	prediction_correct = res == instr->taken;
 
 	if (!prediction_correct || (fabs(y) <= theta)) {
-		branch_predictor->P[hash][0] = branch_predictor->P[hash][i] + instr->taken;
+		branch_predictor->P[hash][0] += sign;
 		for (i = 0; i < n; i++) {
 			branch_predictor->P[hash][i] = branch_predictor->P[hash][i] + sign*branch_predictor->global_history[i];
 		}
