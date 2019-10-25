@@ -119,9 +119,18 @@ Branch_Predictor *initBranchPredictor()
 	#ifdef perceptron
 	branch_predictor->p_mask = p_size - 1;
 	int i = 0;
-	/*for (i; i < n; i++) {
-		branch_predictor->global_history[i] = 1;
-	}*/
+
+	for (i; i < n; i++) {
+		branch_predictor->global_history[i] = 0;
+	}
+	
+	int j;
+	for (i = 0; i < p_size; i++) {
+		for (j = 0; j < n; j++) {
+			branch_predictor->P[i][j] = 0;
+		}
+	}
+
 	#endif
 
     return branch_predictor;
@@ -285,26 +294,26 @@ bool predict(Branch_Predictor *branch_predictor, Instruction *instr)
 	for (i = 1; i < n; i++) {
 		y += branch_predictor->P[hash][i]*branch_predictor->global_history[i];
 	}
-	
+
 	if (y < 0) {
 		res = false;
-		sign = -1;
 	}
 	else {
 		res = true;
+	}
+
+	if (instr->taken) {
 		sign = 1;
+	}
+	else {
+		sign = -1;
 	}
 	
 	prediction_correct = res == instr->taken;
 
 	if (!prediction_correct || (fabs(y) <= theta)) {
-		if (prediction_correct) {
-			branch_predictor->P[hash][0] = branch_predictor->P[hash][i] + 1;
-		}
-		else {
-			branch_predictor->P[hash][0] = branch_predictor->P[hash][i] - 1;
-		}
-		for (i = 1; i < n; i++) {
+		branch_predictor->P[hash][0] = branch_predictor->P[hash][i] + instr->taken;
+		for (i = 0; i < n; i++) {
 			branch_predictor->P[hash][i] = branch_predictor->P[hash][i] + sign*branch_predictor->global_history[i];
 		}
 	}
