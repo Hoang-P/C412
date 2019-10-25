@@ -9,7 +9,7 @@
 
 #include "Instruction.h"
 
-#define p_size 32768
+#define p_size 131072
 #define n 62
 
 // Predictor type
@@ -63,8 +63,8 @@ typedef struct Branch_Predictor
     #endif
 
 	#ifdef perceptron
-	int64_t global_history[62];
-	int64_t P[p_size][62];
+	int64_t global_history[n];
+	int64_t P[p_size][n];
 	unsigned p_mask;
 	#endif
 

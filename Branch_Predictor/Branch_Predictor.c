@@ -294,7 +294,7 @@ bool predict(Branch_Predictor *branch_predictor, Instruction *instr)
 	hash = getIndex(branch_address, branch_predictor->p_mask);
 
 	float y = branch_predictor->P[hash][0];
-	for (i = 1; i < n; i++) {
+	for (i = 0; i < n; i++) {
 		y += branch_predictor->P[hash][i]*branch_predictor->global_history[i];
 	}
 
