@@ -13,13 +13,15 @@
 #include "Request.h"
 
 //#define LRU
-#define LFU
+//#define LFU
+#define SRRIP
 
 /* Cache */
 typedef struct Set
 {
     Cache_Block **ways; // Block ways within a set
 }Set;
+
 
 typedef struct Cache
 {
@@ -37,6 +39,9 @@ typedef struct Cache
     unsigned tag_shift; // To extract tag
 
     Set *sets; // All the sets of a cache
+
+	Sat_Counter *SHCT;
+	//Sat_Counter *srrip;
     
 }Cache;
 
@@ -52,5 +57,6 @@ Cache_Block *findBlock(Cache *cache, uint64_t addr);
 // Replacement Policies
 bool lru(Cache *cache, uint64_t addr, Cache_Block **victim_blk, uint64_t *wb_addr);
 bool lfu(Cache *cache, uint64_t addr, Cache_Block **victim_blk, uint64_t *wb_addr);
+bool srrip(Cache *cache, uint64_t addr, Cache_Block **victim_blk, uint64_t *wb_addr);
 
 #endif

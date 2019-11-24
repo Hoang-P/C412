@@ -6,6 +6,14 @@
 
 #include <stdbool.h>
 
+// saturating counter
+typedef struct Sat_Counter
+{
+    unsigned counter_bits;
+    uint8_t max_val;
+    uint8_t counter;
+}Sat_Counter;
+
 typedef struct Cache_Block
 {
     uint64_t tag;
@@ -22,6 +30,21 @@ typedef struct Cache_Block
     // Advanced Features
     uint64_t PC; // Which instruction that brings in this block?
     int core_id; // Which core the instruction is running on.
+	
+	// SHiP stuff
+	unsigned sig;
+	bool outcome;
+	unsigned RRPV_idx;
+	Sat_Counter RRPV;
+	
 }Cache_Block;
+
+// Counter functions
+void initSatCounter(Sat_Counter *sat_counter, unsigned counter_bits);
+void incrementCounter(Sat_Counter *sat_counter);
+void decrementCounter(Sat_Counter *sat_counter);
+void setTwoCounter(Sat_Counter *sat_counter);
+bool checkZero(Sat_Counter *sat_counter);
+bool checkThree(Sat_Counter *sat_counter);
 
 #endif
