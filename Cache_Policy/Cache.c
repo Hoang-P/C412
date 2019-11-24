@@ -98,6 +98,7 @@ bool accessBlock(Cache *cache, Request *req, uint64_t access_time)
     {
         hit = true;
 		blk->outcome = true;
+		incrementCounter(&(cache->SHCT[blk->sig]));
 
         // Update access time	
         blk->when_touched = access_time;
