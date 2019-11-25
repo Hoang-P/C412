@@ -30,7 +30,6 @@ Cache *initCache()
         cache->blocks[i].frequency = 0;
 		cache->blocks[i].outcome = false;
 		cache->blocks[i].sig = 0;
-		//cache->blocks[i].RRPV = (Sat_Counter *)malloc(cache_size * sizeof(Sat_Counter));
 		initSatCounter(&(cache->blocks[i].RRPV), counter_bits);
     }
 
@@ -98,6 +97,7 @@ bool accessBlock(Cache *cache, Request *req, uint64_t access_time)
     {
         hit = true;
 		blk->outcome = true;
+		blk->sig = blk->PC & (cache_size - 1);
 		incrementCounter(&(cache->SHCT[blk->sig]));
 		setZeroCounter(&(blk->RRPV));
 
@@ -137,9 +137,7 @@ bool insertBlock(Cache *cache, Request *req, uint64_t access_time, uint64_t *wb_
 	victim->sig = victim->PC & (cache_size - 1);
 	if (victim->outcome != true)
 	{
-		//unsigned idx = victim->PC & (cache_size - 1);
 		decrementCounter(&(cache->SHCT[victim->sig]));
-		//decrementCounter(&(cache->SHCT[idx]));
 	}
 	victim->outcome = false;
 	victim->sig = req->PC & (cache_size - 1);
@@ -315,16 +313,16 @@ bool srrip(Cache *cache, uint64_t addr, Cache_Block **victim_blk, uint64_t *wb_a
             {
                 victim = ways[i];
 				found = true;
-                break;
+                //break;
             }
         }
 		if (found) {break;}
-        for (i = 0; i < cache->num_blocks; i++)
+        for (i = 0; i < cache->num_ways; i++)
         {
-			incrementCounter(&(cache->blocks[i].RRPV));
+			incrementCounter(&(ways[i]->RRPV));
         }
     }
-
+	
     // Step three, need to write-back the victim block
     *wb_addr = (victim->tag << cache->tag_shift) | (victim->set << cache->set_shift);
 //    uint64_t ori_addr = (victim->tag << cache->tag_shift) | (victim->set << cache->set_shift);
