@@ -99,6 +99,7 @@ bool accessBlock(Cache *cache, Request *req, uint64_t access_time)
         hit = true;
 		blk->outcome = true;
 		incrementCounter(&(cache->SHCT[blk->sig]));
+		setZeroCounter(&(blk->RRPV));
 
         // Update access time	
         blk->when_touched = access_time;
@@ -367,6 +368,11 @@ inline void decrementCounter(Sat_Counter *sat_counter)
 inline void setTwoCounter(Sat_Counter *sat_counter)
 {
     sat_counter->counter = 2;
+}
+
+inline void setZeroCounter(Sat_Counter *sat_counter)
+{
+    sat_counter->counter = 0;
 }
 
 inline bool checkZero(Sat_Counter *sat_counter)

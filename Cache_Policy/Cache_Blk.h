@@ -44,6 +44,7 @@ void initSatCounter(Sat_Counter *sat_counter, unsigned counter_bits);
 void incrementCounter(Sat_Counter *sat_counter);
 void decrementCounter(Sat_Counter *sat_counter);
 void setTwoCounter(Sat_Counter *sat_counter);
+void setZeroCounter(Sat_Counter *sat_counter);
 bool checkZero(Sat_Counter *sat_counter);
 bool checkThree(Sat_Counter *sat_counter);
 
